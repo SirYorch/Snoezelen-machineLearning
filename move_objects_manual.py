@@ -3,8 +3,6 @@ import math
 import bpy
 import bpy_extras.object_utils
 
-_RENDER_RUNNING = False
-
 X_MIN, X_MAX = 0, 3.0
 Y_MIN, Y_MAX = 0, 6.0
 Z_MIN, Z_MAX = 0, 3.0
@@ -34,17 +32,17 @@ if collection:
 else:
     NOMBRES_OBJETOS = ["Dado", "Puff_01", "Puff_02"]
 
-def MoveObjects(scene, camera_name = "Camera.001"):
+def MoveObjects(scene, camera_name, object_name):
     print("Camara activa: ",scene.camera)
     camera = bpy.data.objects[camera_name]
     print("Camara para renderizar: ", camera)
+    print(object_name)
     scene.camera = camera
     print("Camara para activa actualizada: ", scene.camera)
     #frame = scene.frame_current
     #random.seed(frame)
-    object_name = scene.get("object_name", "Dado")
-    print(object_name)
-    #print(object_name)
+    #objeto_activo = scene.get(object_name, "Dado")
+    #print(objeto_activo)
 
     for nombre in NOMBRES_OBJETOS:
         obj_comprobar = bpy.data.objects.get(nombre)
@@ -165,21 +163,22 @@ def DrawBorder(camera, scene, obj):
 #obj = bpy.data.objects["Dado"]
 #DrawBorder(camera, scene, obj)
 
-#bpy.app.handlers.frame_change_pre.clear()
+bpy.app.handlers.frame_change_pre.clear()
 #bpy.app.handlers.frame_change_pre.append(MoveObjects)
 
+def Renderizado(camera_name="Camera", object_name="Dado"):
+    scene = bpy.context.scene
+    frame_end = scene.frame_end
+    ruta_original = scene.render.filepath
+    print("\n Renderizando Secuencia ")
+    print("\n Frames totales: " + str(frame_end))
+    for frame in range(0, 10 + 1):
+        scene.frame_set(frame)
+        MoveObjects(scene, camera_name, object_name)
+        scene.render.filepath = ruta_original + str(frame).zfill(4)
+        print(f"Renderizando frame {frame}")
+        bpy.ops.render.render(write_still = True)
 
-def Renderizar(scene):
-    global _RENDER_RUNNING
-    if _RENDER_RUNNING:
-        return
-    _RENDER_RUNNING = True
+    scene.render.filepath = ruta_original
 
-    try:
-        MoveObjects(scene)
-    finally:
-        _RENDER_RUNNING = False
-
-
-bpy.app.handlers.render_pre.clear()
-bpy.app.handlers.render_pre.append(Renderizar)
+Renderizado("Camera.001", "Puff_01")
