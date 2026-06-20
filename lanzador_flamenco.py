@@ -1,10 +1,9 @@
 import bpy
 
-COLECCION = "Objetos_Detectar"
-collection = bpy.data.collections.get(COLECCION)
+collection = bpy.data.collections.get("Objetos_Detectar")
 
 if not collection or len(collection.objects) == 0:
-    print(f"Error la colección '{COLECCION}' está vacía o no existe")
+    print("Error la colección Objetos_Detectar está vacía o no existe")
 else:
     scene = bpy.context.scene
 
