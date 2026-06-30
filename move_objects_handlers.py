@@ -4,7 +4,8 @@ import bpy
 import bpy_extras.object_utils
 
 X_MIN, X_MAX = 0, 3.0
-Y_MIN, Y_MAX = 0, 6.0
+#Y_MIN, Y_MAX = 0, 6.0
+Y_MIN, Y_MAX = 0, 5.3
 Z_MIN, Z_MAX = 0, 3.0
 
 COLUMNAS = [
@@ -59,33 +60,40 @@ def MoveObjects(scene, camera_name, object_name):
     #print("Objeto Activo: ",obj)
     obj.hide_render = False
     #obj.hide_viewport = False
-    x, y, z = 1.0, 1.0, 1.0
-    for _ in range(50):
-        colision = False
-        # Generar las posiciones aleatorias dentro de la sala
-        x = random.uniform(X_MIN + MARGEN_OBJETOS, X_MAX - MARGEN_OBJETOS)
-        y = random.uniform(Y_MIN + MARGEN_OBJETOS, Y_MAX - MARGEN_OBJETOS)
-        z = random.uniform(Z_MIN + MARGEN_OBJETOS, Z_MAX - MARGEN_OBJETOS)
-
-        # Verificar que no existan colisiones del objeto con el escenario
-        for obstaculo in OBSTACULOS:
-            for ox, oy, o_radio in obstaculo:
-                distancia = math.sqrt((x - ox)**2 + (y - oy)**2)
-                if distancia < (o_radio + MARGEN_OBJETOS):
-                    colision = True
-                    break
-
-        if not colision:
-            # Trasladar el objeto
-            obj.location = (x, y, z)
-
-            # Rotar el objeto
-            obj.rotation_euler = (
-                random.uniform(0, 2 * math.pi),
-                random.uniform(0, 2 * math.pi),
-                random.uniform(0, 2 * math.pi)
-            )
-            break
+    x, z = 1.5, 1.0
+    y = scene.frame_end * Y_MAX / scene.frame_current
+    obj.location = (x, y, z)
+    obj.rotation_euler = (
+        random.uniform(0, 2 * math.pi),
+        random.uniform(0, 2 * math.pi),
+        random.uniform(0, 2 * math.pi)
+    )
+#    for _ in range(50):
+#        colision = False
+#        # Generar las posiciones aleatorias dentro de la sala
+#        x = random.uniform(X_MIN + MARGEN_OBJETOS, X_MAX - MARGEN_OBJETOS)
+#        y = random.uniform(Y_MIN + MARGEN_OBJETOS, Y_MAX - MARGEN_OBJETOS)
+#        z = random.uniform(Z_MIN + MARGEN_OBJETOS, Z_MAX - MARGEN_OBJETOS)
+#
+#        # Verificar que no existan colisiones del objeto con el escenario
+#        for obstaculo in OBSTACULOS:
+#            for ox, oy, o_radio in obstaculo:
+#                distancia = math.sqrt((x - ox)**2 + (y - oy)**2)
+#                if distancia < (o_radio + MARGEN_OBJETOS):
+#                    colision = True
+#                    break
+#
+#        if not colision:
+#            # Trasladar el objeto
+#            obj.location = (x, y, z)
+#
+#            # Rotar el objeto
+#            obj.rotation_euler = (
+#                random.uniform(0, 2 * math.pi),
+#                random.uniform(0, 2 * math.pi),
+#                random.uniform(0, 2 * math.pi)
+#            )
+#            break
 
     print("Ubicacion Objeto: " + str(x) + ", " + str(y) + ", " + str(z))
     # Forzar la actualizacion de las transformaciones del objeto
