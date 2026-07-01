@@ -1,3 +1,4 @@
+// Script para correr el script al momento de renderizar con flamenco
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 const JOB_TYPE = {
