@@ -1,12 +1,18 @@
+### Este script mueve un objeto que recibimos como parametro mediante hadlers, para cuando se realiza el renderizado normal de blender+flamenco
+
 import random
-import math
 import bpy
-import bpy_extras.object_utils
+import sys
+import argparse
 
 X_MIN, X_MAX = 0, 3.0
 #Y_MIN, Y_MAX = 0, 6.0
 Y_MIN, Y_MAX = 0, 5.3
 Z_MIN, Z_MAX = 0, 3.0
+
+RX_MAX = 360
+RY_MAX = 360
+RZ_MAX = 360
 
 COLUMNAS = [
     (3, 2.6, 0),
@@ -34,12 +40,12 @@ else:
     NOMBRES_OBJETOS = ["Dado", "Puff_01", "Puff_02"]
 
 def MoveObjects(scene, camera_name, object_name):
-    print("Camara activa: ",scene.camera)
+    print("HANDLER: Camara activa: ",scene.camera)
     camera = bpy.data.objects[camera_name]
-    print("Camara para renderizar: ", camera)
-    print(object_name)
+    print("HANDLER: Camara para renderizar: ", camera)
+    #print(object_name)
     scene.camera = camera
-    print("Camara para activa actualizada: ", scene.camera)
+    print("HANDLER: Camara para activa actualizada: ", scene.camera)
     #frame = scene.frame_current
     #random.seed(frame)
     #objeto_activo = scene.get(object_name, "Dado")
@@ -52,7 +58,7 @@ def MoveObjects(scene, camera_name, object_name):
             #obj_comprobar.hide_viewport = (nombre != object_name)
 
     obj = bpy.data.objects.get(object_name)
-    print("Objeto Activo: ",obj)
+    print("HANDLER: Objeto Activo: ",obj)
     if not obj:
         return
 
@@ -60,156 +66,61 @@ def MoveObjects(scene, camera_name, object_name):
     #print("Objeto Activo: ",obj)
     obj.hide_render = False
     #obj.hide_viewport = False
-    x, z = 1.5, 1.0
-    y = scene.frame_end * Y_MAX / scene.frame_current
+    # Constantes para calcular las posiciones del objeto
+    Q_X = 3
+    Q_Y = 3
+    Q_Z = 2
+    # Constantes para calcular las rotaciones del objeto
+    QR_X = 2
+    QR_Y = 2
+    QR_Z = 2
+
+    frame = scene.frame_current
+    x = (frame%Q_X * (X_MAX/Q_X)) + random.uniform(-0.3, 0.3)
+    y = ((frame//Q_X)%Q_Y * (Y_MAX/Q_Y)) + random.uniform(-0.3, 0.3)
+    z = ((frame//(Q_X*Q_Y))%Q_Z * (Z_MAX/Q_Z)) + random.uniform(-0.2, 0.2)
+
+    r_x = ((frame//(Q_X*Q_Y*Q_Z))%QR_X * (RX_MAX/QR_X)) + random.uniform(-5, 5)
+    r_y = ((frame//(Q_X*Q_Y*Q_Z*QR_X))%QR_Y * (RY_MAX/QR_Y)) + random.uniform(-5, 5)
+    r_z = ((frame//(Q_X*Q_Y*Q_Z*QR_X*QR_Y))%QR_Z * (RZ_MAX/QR_Z)) + random.uniform(-5, 5)
+
+    # Trasladar el objeto
     obj.location = (x, y, z)
-    obj.rotation_euler = (
-        random.uniform(0, 2 * math.pi),
-        random.uniform(0, 2 * math.pi),
-        random.uniform(0, 2 * math.pi)
-    )
-#    for _ in range(50):
-#        colision = False
-#        # Generar las posiciones aleatorias dentro de la sala
-#        x = random.uniform(X_MIN + MARGEN_OBJETOS, X_MAX - MARGEN_OBJETOS)
-#        y = random.uniform(Y_MIN + MARGEN_OBJETOS, Y_MAX - MARGEN_OBJETOS)
-#        z = random.uniform(Z_MIN + MARGEN_OBJETOS, Z_MAX - MARGEN_OBJETOS)
-#
-#        # Verificar que no existan colisiones del objeto con el escenario
-#        for obstaculo in OBSTACULOS:
-#            for ox, oy, o_radio in obstaculo:
-#                distancia = math.sqrt((x - ox)**2 + (y - oy)**2)
-#                if distancia < (o_radio + MARGEN_OBJETOS):
-#                    colision = True
-#                    break
-#
-#        if not colision:
-#            # Trasladar el objeto
-#            obj.location = (x, y, z)
-#
-#            # Rotar el objeto
-#            obj.rotation_euler = (
-#                random.uniform(0, 2 * math.pi),
-#                random.uniform(0, 2 * math.pi),
-#                random.uniform(0, 2 * math.pi)
-#            )
-#            break
+    # Rotar el objeto
+    obj.rotation_euler = (r_x, r_y, r_z)
+    #obj.rotation_euler = (
+    #    random.uniform(0, 2 * math.pi),
+    #    random.uniform(0, 2 * math.pi),
+    #    random.uniform(0, 2 * math.pi)
+    #)
+    print(f"HANDLER: Ubicacion del objeto: {x}; {y}; {z}")
+    print(f"HANDLER: Rotacion del objeto: {obj.rotation_euler}")
+    print(f"HANDLER: Rotaciones calculadas: {r_x}; {r_y}; {r_z}")
 
-    print("Ubicacion Objeto: " + str(x) + ", " + str(y) + ", " + str(z))
-    # Forzar la actualizacion de las transformaciones del objeto
-    #bpy.context.view_layer.update()
-    #DrawBorder(camera, scene, obj)
+argv = sys.argv
+argv = argv[argv.index("--")+1:]
 
-def DrawBorder(camera, scene, obj):
-    print("\nRenderizar con borde. Frame "+str(scene.frame_current))
-    print("Objeto Activo Para el bounding box: ", obj)
-    render = scene.render
-    print("Bordes de renderizado: ",
-          scene.frame_current,
-          render.border_min_x,
-          render.border_min_y,
-          render.border_max_x,
-          render.border_max_y
-          )
-    #ubicacion = obj.location
-    #print("Ubicacion Objeto: " + str(ubicacion[0]) + ", " + str(ubicacion[1]) + ", " + str(ubicacion[2]))
-
-    margen_borde = 0.005
-
-    # Obtener los vertices del bounding box
-    mesh = obj.bound_box
-
-    # Obtener la matriz de las transformaciones del objeto
-    matrix = obj.matrix_world
-    col0 = matrix.col[0]
-    col1 = matrix.col[1]
-    col2 = matrix.col[2]
-    col3 = matrix.col[3]
-
-    minX = 1
-    maxX = 0
-    minY = 1
-    maxY = 0
-
-    numVertices = len(mesh)
-
-    # Calcular las coordenadas de los vertices del recuadro
-    for t in range(0, numVertices):
-        co = mesh[t]
-        pos = (col0 * co[0]) + (col1 * co[1]) + (col2 * co[2]) + col3
-        pos = bpy_extras.object_utils.world_to_camera_view(scene, camera, pos)
-        if (pos.x < minX):
-            minX = pos.x
-        if (pos.y < minY):
-            minY = pos.y
-        if (pos.x > maxX):
-            maxX = pos.x
-        if (pos.y > maxY):
-            maxY = pos.y
-
-    render.use_border = True
-    #render.use_crop_to_border = True
-
-    # Agregar un margen al borde
-    minX -= margen_borde
-    minY -= margen_borde
-    maxX += margen_borde
-    maxY += margen_borde
-
-    # Obtener las coordenadas y la relacion con el recuado de renderizado
-    pMinX = str(int(minX*render.resolution_x))
-    pMinY = str(int(minY*render.resolution_y))
-    pMaxX = str(int(maxX*render.resolution_x))
-    pMaxY = str(int(maxY*render.resolution_y))
-    print("Coordenadas del borde  ("+pMinX+", "+pMinY+") - ("+pMaxX+", "+pMaxY+")")
-
-    print("Borde nuevo: ",
-          minX,
-          minY,
-          maxX,
-          maxY
-          )
-
-
-    #render.border_min_x = minX
-    #render.border_min_y = minY
-    #render.border_max_x = maxX
-    #render.border_max_y = maxY
-    # Para asegurar que el recuadro se quede dentro de la pantalla de renderizado
-    render.border_min_x = max(0.0, min(1.0, minX))
-    render.border_min_y = max(0.0, min(1.0, minY))
-    render.border_max_x = max(0.0, min(1.0, maxX))
-    render.border_max_y = max(0.0, min(1.0, maxY))
-
-# Creamos un recuadro al iniciar, para el primer frame
-#scene = bpy.context.scene
-#camera = bpy.data.objects['Camera.001']
-#obj = bpy.data.objects["Dado"]
-#DrawBorder(camera, scene, obj)
-
-#bpy.app.handlers.frame_change_pre.clear()
-#bpy.app.handlers.frame_change_pre.append(MoveObjects)
-
-def Renderizado(camera_name="Camera", object_name="Dado"):
-    scene = bpy.context.scene
-    frame_end = scene.frame_end
-    ruta_original = scene.render.filepath
-    print("\n Renderizando Secuencia ")
-    print("\n Frames totales: " + str(frame_end))
-    for frame in range(0, 10 + 1):
-        scene.frame_set(frame)
-        MoveObjects(scene, camera_name, object_name)
-        scene.render.filepath = ruta_original + str(frame).zfill(4)
-        print(f"Renderizando frame {frame}")
-        bpy.ops.render.render(write_still = True)
-
-    scene.render.filepath = ruta_original
+if argv:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--format", type=str, required=True)
+    parser.add_argument("--frame", type=int, required=True)
+    parser.add_argument("--frames_total", type=int, required=True)
+    parser.add_argument("--camera", type=str, required=True)
+    parser.add_argument("--object", type=str, required=True)
+    args, unknow = parser.parse_known_args(argv)
+    print("HANDLER: output: ", args.output);
+    print("HANDLER: format: ", args.format);
+    print("HANDLER: frame: ", args.frame)
+    print("HANDLER: frames_total: ", args.frames_total)
+    print("HANDLER: camera: ", args.camera)
+    print("HANDLER: object: ", args.object)
 
 def frame_handler(scene):
     random.seed(scene.frame_current)
-    MoveObjects(scene, "Camera.001", "Dado")
+    MoveObjects(scene, "Camera.002", "Dado")
 
-print("Cantidad de handlers: ", len(bpy.app.handlers.frame_change_post))
+print("HANDLER: Cantidad de handlers: ", len(bpy.app.handlers.frame_change_post))
 for h in bpy.app.handlers.frame_change_post:
     print("Handler: ", h)
 
