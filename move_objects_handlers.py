@@ -101,10 +101,15 @@ def MoveObjects(scene, camera_name, object_name):
 def PunchingLightsRandom(scene):
     col_lights = bpy.data.collection.get("Luces_Pared_Golpes")
     for light in col_lights.objects:
+        print("HANDLER: Luz actual: ", light)
         location = light.location
         x = location.x
         y = random.randint(0, 1)
         z = location.z
+        if (y == 1):
+            print("HANDLER: Luz Prendida")
+        else:
+            print("HANDLER: Luz Apagada")
 
         light.location = (x, y, z)
 
