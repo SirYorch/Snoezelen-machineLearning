@@ -19,13 +19,13 @@ RZ_MAX = 360
 
 def MoveObjects(scene, camera, object_name, obj, frames_total):
     # Constantes para calcular las posiciones del objeto
-    Q_X = 3
-    Q_Y = 3
-    Q_Z = 2
+    Q_X = 10
+    Q_Y = 10
+    Q_Z = 5
     # Constantes para calcular las rotaciones del objeto
-    QR_X = 2
-    QR_Y = 2
-    QR_Z = 2
+    QR_X = 7
+    QR_Y = 7
+    QR_Z = 7
 
     if not obj:
         return
@@ -35,9 +35,9 @@ def MoveObjects(scene, camera, object_name, obj, frames_total):
     y = ((frame//Q_X)%Q_Y * (Y_MAX/Q_Y)) + random.uniform(-0.3, 0.3)
     z = ((frame//(Q_X*Q_Y))%Q_Z * (Z_MAX/Q_Z)) + random.uniform(-0.2, 0.2)
 
-    r_x = ((frame//(Q_X*Q_Y*Q_Z))%QR_X * (RX_MAX/QR_X)) + random.uniform(-5, 5)
-    r_y = ((frame//(Q_X*Q_Y*Q_Z*QR_X))%QR_Y * (RY_MAX/QR_Y)) + random.uniform(-5, 5)
-    r_z = ((frame//(Q_X*Q_Y*Q_Z*QR_X*QR_Y))%QR_Z * (RZ_MAX/QR_Z)) + random.uniform(-5, 5)
+    r_x = ((frame//(Q_X*Q_Y*Q_Z))%QR_X * (RX_MAX/QR_X)) + random.uniform(-25, 25)
+    r_y = ((frame//(Q_X*Q_Y*Q_Z*QR_X))%QR_Y * (RY_MAX/QR_Y)) + random.uniform(-25, 25)
+    r_z = ((frame//(Q_X*Q_Y*Q_Z*QR_X*QR_Y))%QR_Z * (RZ_MAX/QR_Z)) + random.uniform(-25, 25)
 
     # Trasladar el objeto
     obj.location = (x, y, z)

@@ -4,6 +4,7 @@ import random
 import bpy
 import sys
 import argparse
+import math
 
 X_MIN, X_MAX = 0, 3.0
 #Y_MIN, Y_MAX = 0, 6.0
@@ -67,27 +68,27 @@ def MoveObjects(scene, camera_name, object_name):
     obj.hide_render = False
     #obj.hide_viewport = False
     # Constantes para calcular las posiciones del objeto
-    Q_X = 3
-    Q_Y = 3
-    Q_Z = 2
+    Q_X = 10
+    Q_Y = 10
+    Q_Z = 5
     # Constantes para calcular las rotaciones del objeto
-    QR_X = 2
-    QR_Y = 2
-    QR_Z = 2
+    QR_X = 7
+    QR_Y = 7
+    QR_Z = 7
 
     frame = scene.frame_current
     x = (frame%Q_X * (X_MAX/Q_X)) + random.uniform(-0.3, 0.3)
     y = ((frame//Q_X)%Q_Y * (Y_MAX/Q_Y)) + random.uniform(-0.3, 0.3)
     z = ((frame//(Q_X*Q_Y))%Q_Z * (Z_MAX/Q_Z)) + random.uniform(-0.2, 0.2)
 
-    r_x = ((frame//(Q_X*Q_Y*Q_Z))%QR_X * (RX_MAX/QR_X)) + random.uniform(-5, 5)
-    r_y = ((frame//(Q_X*Q_Y*Q_Z*QR_X))%QR_Y * (RY_MAX/QR_Y)) + random.uniform(-5, 5)
-    r_z = ((frame//(Q_X*Q_Y*Q_Z*QR_X*QR_Y))%QR_Z * (RZ_MAX/QR_Z)) + random.uniform(-5, 5)
+    r_x = ((frame//(Q_X*Q_Y*Q_Z))%QR_X * (RX_MAX/QR_X)) + random.uniform(-25, 25)
+    r_y = ((frame//(Q_X*Q_Y*Q_Z*QR_X))%QR_Y * (RY_MAX/QR_Y)) + random.uniform(-25, 25)
+    r_z = ((frame//(Q_X*Q_Y*Q_Z*QR_X*QR_Y))%QR_Z * (RZ_MAX/QR_Z)) + random.uniform(-25, 25)
 
     # Trasladar el objeto
     obj.location = (x, y, z)
     # Rotar el objeto
-    obj.rotation_euler = (r_x, r_y, r_z)
+    obj.rotation_euler = (math.radians(r_x), math.radians(r_y), math.radians(r_z))
     #obj.rotation_euler = (
     #    random.uniform(0, 2 * math.pi),
     #    random.uniform(0, 2 * math.pi),
