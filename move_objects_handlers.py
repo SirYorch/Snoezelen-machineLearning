@@ -4,7 +4,6 @@ import random
 import bpy
 import sys
 import argparse
-import math
 
 X_MIN, X_MAX = 0, 3.0
 #Y_MIN, Y_MAX = 0, 6.0
@@ -68,27 +67,27 @@ def MoveObjects(scene, camera_name, object_name):
     obj.hide_render = False
     #obj.hide_viewport = False
     # Constantes para calcular las posiciones del objeto
-    Q_X = 10
-    Q_Y = 10
-    Q_Z = 5
+    Q_X = 3
+    Q_Y = 3
+    Q_Z = 2
     # Constantes para calcular las rotaciones del objeto
-    QR_X = 7
-    QR_Y = 7
-    QR_Z = 7
+    QR_X = 2
+    QR_Y = 2
+    QR_Z = 2
 
     frame = scene.frame_current
     x = (frame%Q_X * (X_MAX/Q_X)) + random.uniform(-0.3, 0.3)
     y = ((frame//Q_X)%Q_Y * (Y_MAX/Q_Y)) + random.uniform(-0.3, 0.3)
     z = ((frame//(Q_X*Q_Y))%Q_Z * (Z_MAX/Q_Z)) + random.uniform(-0.2, 0.2)
 
-    r_x = ((frame//(Q_X*Q_Y*Q_Z))%QR_X * (RX_MAX/QR_X)) + random.uniform(-25, 25)
-    r_y = ((frame//(Q_X*Q_Y*Q_Z*QR_X))%QR_Y * (RY_MAX/QR_Y)) + random.uniform(-25, 25)
-    r_z = ((frame//(Q_X*Q_Y*Q_Z*QR_X*QR_Y))%QR_Z * (RZ_MAX/QR_Z)) + random.uniform(-25, 25)
+    r_x = ((frame//(Q_X*Q_Y*Q_Z))%QR_X * (RX_MAX/QR_X)) + random.uniform(-5, 5)
+    r_y = ((frame//(Q_X*Q_Y*Q_Z*QR_X))%QR_Y * (RY_MAX/QR_Y)) + random.uniform(-5, 5)
+    r_z = ((frame//(Q_X*Q_Y*Q_Z*QR_X*QR_Y))%QR_Z * (RZ_MAX/QR_Z)) + random.uniform(-5, 5)
 
     # Trasladar el objeto
     obj.location = (x, y, z)
     # Rotar el objeto
-    obj.rotation_euler = (math.radians(r_x), math.radians(r_y), math.radians(r_z))
+    obj.rotation_euler = (r_x, r_y, r_z)
     #obj.rotation_euler = (
     #    random.uniform(0, 2 * math.pi),
     #    random.uniform(0, 2 * math.pi),
@@ -100,16 +99,19 @@ def MoveObjects(scene, camera_name, object_name):
 
 # Randomizar las luces de la pared de golpes
 def PunchingLightsRandom(scene):
-    col_lights = bpy.data.collection.get("Luces_Pared_Golpes")
+    col_lights = bpy.data.collections.get("Luces_Pared_Golpes")
     for light in col_lights.objects:
-        print("HANDLER: Luz actual: ", light)
+        # print("HANDLER: Luz actual: ", light)
+        # print("HANDLER: Luz actual ubicacion: ", light.location)
         location = light.location
         x = location.x
-        y = random.randint(0, 1)
         z = location.z
-        if (y == 1):
+        state = random.randint(0, 10)
+        if (state >= 8):
+            y = 1
             print("HANDLER: Luz Prendida")
         else:
+            y = 0
             print("HANDLER: Luz Apagada")
 
         light.location = (x, y, z)
@@ -135,7 +137,7 @@ if argv:
 
 def frame_handler(scene):
     random.seed(scene.frame_current)
-    MoveObjects(scene, "Camera.002", "Dado")
+    MoveObjects(scene, "Camera.001", "Dado")
     PunchingLightsRandom(scene)
 
 print("HANDLER: Cantidad de handlers: ", len(bpy.app.handlers.frame_change_post))

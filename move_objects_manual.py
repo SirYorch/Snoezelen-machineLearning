@@ -54,16 +54,19 @@ def MoveObjects(scene, camera, object_name, obj, frames_total):
 
 # Randomizar las luces de la pared de golpes
 def PunchingLightsRandom(scene):
-    col_lights = bpy.data.collection.get("Luces_Pared_Golpes")
+    col_lights = bpy.data.collections.get("Luces_Pared_Golpes")
     for light in col_lights.objects:
-        print("SCRIPT: Luz actual: ", light)
+        # print("SCRIPT: Luz actual: ", light)
+        # print("SCRIPT: Luz actual ubicacion: ", light.location)
         location = light.location
         x = location.x
-        y = random.randint(0, 1)
         z = location.z
-        if (y == 1):
+        state = random.randint(0, 10)
+        if (state >= 8):
+            y = 1
             print("SCRIPT: Luz Prendida")
         else:
+            y = 0
             print("SCRIPT: Luz Apagada")
 
         light.location = (x, y, z)
@@ -133,7 +136,7 @@ def DrawBorder(camera, scene, obj):
     render.border_max_x = max(0.0, min(1.0, maxX))
     render.border_max_y = max(0.0, min(1.0, maxY))
 
-def Renderizado(camera_name="Camera.002", object_name="Dado", frame=1, output=None, frames_total=1):
+def Renderizado(camera_name="Camera.001", object_name="Dado", frame=1, output=None, frames_total=1):
     scene = bpy.context.scene
     random.seed(scene.frame_current)
     print(f"SCRIPT: Frames a renderizar {scene.frame_end}")
