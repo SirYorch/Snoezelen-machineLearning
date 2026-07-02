@@ -97,6 +97,17 @@ def MoveObjects(scene, camera_name, object_name):
     print(f"HANDLER: Rotacion del objeto: {obj.rotation_euler}")
     print(f"HANDLER: Rotaciones calculadas: {r_x}; {r_y}; {r_z}")
 
+# Randomizar las luces de la pared de golpes
+def PunchingLightsRandom(scene):
+    col_lights = bpy.data.collection.get("Luces_Pared_Golpes")
+    for light in col_lights.objects:
+        location = light.location
+        x = location.x
+        y = random.randint(0, 1)
+        z = location.z
+
+        light.location = (x, y, z)
+
 argv = sys.argv
 argv = argv[argv.index("--")+1:]
 
@@ -119,6 +130,7 @@ if argv:
 def frame_handler(scene):
     random.seed(scene.frame_current)
     MoveObjects(scene, "Camera.002", "Dado")
+    PunchingLightsRandom(scene)
 
 print("HANDLER: Cantidad de handlers: ", len(bpy.app.handlers.frame_change_post))
 for h in bpy.app.handlers.frame_change_post:

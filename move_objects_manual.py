@@ -52,6 +52,17 @@ def MoveObjects(scene, camera, object_name, obj, frames_total):
     print(f"SCRIPT: Rotacion del objeto: {obj.rotation_euler}")
     print(f"SCRIPT: Rotaciones calculadas: {r_x}; {r_y}; {r_z}")
 
+# Randomizar las luces de la pared de golpes
+def PunchingLightsRandom(scene):
+    col_lights = bpy.data.collection.get("Luces_Pared_Golpes")
+    for light in col_lights.objects:
+        location = light.location
+        x = location.x
+        y = random.randint(0, 1)
+        z = location.z
+
+        light.location = (x, y, z)
+
 def DrawBorder(camera, scene, obj):
     print("\nHANDLER: Renderizar con borde. Frame "+str(scene.frame_current))
     print("SCRIPT: Objeto Activo Para el bounding box: ", obj)
@@ -141,6 +152,7 @@ def Renderizado(camera_name="Camera.002", object_name="Dado", frame=1, output=No
     #scene.view_layers[0].update()
     # Mover los objetos
     MoveObjects(scene, camera, object_name, obj, frames_total)
+    PunchingLightsRandom(scene)
     #scene.view_layers[0].update()
     # Restringir los bordes del renderizado
     DrawBorder(camera, scene, obj)
